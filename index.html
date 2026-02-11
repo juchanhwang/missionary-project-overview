@@ -1,0 +1,2456 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Missionary Project - DB & Roadmap</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap');
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #ec2327;
+        --primary-light: #ff6b6b;
+        --primary-bg: #fff5f5;
+        --secondary: #2c3e50;
+        --secondary-light: #34495e;
+        --accent: #3498db;
+        --accent-light: #5dade2;
+        --success: #27ae60;
+        --success-light: #2ecc71;
+        --warning: #f39c12;
+        --warning-light: #f1c40f;
+        --gray-50: #fafafa;
+        --gray-100: #f5f5f5;
+        --gray-200: #eeeeee;
+        --gray-300: #e0e0e0;
+        --gray-400: #bdbdbd;
+        --gray-500: #9e9e9e;
+        --gray-600: #757575;
+        --gray-700: #616161;
+        --gray-800: #424242;
+        --gray-900: #212121;
+        --white: #ffffff;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+        --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+        --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.12);
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --radius-xl: 24px;
+      }
+
+      body {
+        font-family:
+          'Noto Sans KR',
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e8edf2 100%);
+        color: var(--gray-900);
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      /* ===== HEADER ===== */
+      .hero {
+        background: linear-gradient(135deg, var(--secondary) 0%, #1a252f 100%);
+        color: white;
+        padding: 60px 40px 50px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background:
+          radial-gradient(
+            circle at 30% 50%,
+            rgba(236, 35, 39, 0.15) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 70% 80%,
+            rgba(52, 152, 219, 0.1) 0%,
+            transparent 50%
+          );
+        animation: float 20s ease-in-out infinite;
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translate(0, 0);
+        }
+        50% {
+          transform: translate(-20px, -10px);
+        }
+      }
+      .hero > * {
+        position: relative;
+        z-index: 1;
+      }
+      .hero-badge {
+        display: inline-block;
+        background: rgba(236, 35, 39, 0.2);
+        border: 1px solid rgba(236, 35, 39, 0.4);
+        color: #ff9999;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+      }
+      .hero h1 {
+        font-size: 42px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        letter-spacing: -1px;
+      }
+      .hero p {
+        font-size: 18px;
+        opacity: 0.7;
+        max-width: 600px;
+        margin: 0 auto;
+        font-weight: 300;
+      }
+
+      /* ===== NAV TABS ===== */
+      .nav-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        padding: 20px 40px;
+        background: var(--white);
+        border-bottom: 1px solid var(--gray-200);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: var(--shadow-sm);
+      }
+      .nav-tab {
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        color: var(--gray-600);
+        transition: all 0.2s;
+      }
+      .nav-tab:hover {
+        background: var(--gray-100);
+        color: var(--gray-900);
+      }
+      .nav-tab.active {
+        background: var(--secondary);
+        color: white;
+      }
+
+      /* ===== SECTION COMMON ===== */
+      .section {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 24px;
+        display: none;
+      }
+      .section.active {
+        display: block;
+      }
+      .section-header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      .section-header h2 {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--secondary);
+        margin-bottom: 8px;
+      }
+      .section-header p {
+        font-size: 16px;
+        color: var(--gray-600);
+        font-weight: 300;
+      }
+
+      /* ===== DB DIAGRAM ===== */
+      .db-legend {
+        display: flex;
+        gap: 24px;
+        justify-content: center;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+      }
+      .db-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--gray-600);
+      }
+      .db-legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+      }
+
+      .db-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+      }
+
+      .db-domain-group {
+        margin-bottom: 48px;
+      }
+      .db-domain-title {
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 16px;
+        padding-left: 4px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .db-domain-title::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--gray-300);
+      }
+
+      .db-table {
+        background: var(--white);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        border: 1px solid var(--gray-200);
+      }
+      .db-table:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+      }
+      .db-table-header {
+        padding: 14px 18px;
+        font-weight: 700;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: white;
+      }
+      .db-table-header .icon {
+        font-size: 18px;
+      }
+      .db-table-body {
+        padding: 12px 0;
+      }
+      .db-field {
+        padding: 5px 18px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--gray-700);
+      }
+      .db-field:hover {
+        background: var(--gray-50);
+      }
+      .db-field-icon {
+        width: 16px;
+        text-align: center;
+        font-size: 11px;
+        flex-shrink: 0;
+      }
+      .db-field-name {
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        font-size: 12px;
+        color: var(--gray-800);
+        font-weight: 500;
+      }
+      .db-field-type {
+        margin-left: auto;
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        font-size: 11px;
+        color: var(--gray-500);
+        background: var(--gray-100);
+        padding: 1px 6px;
+        border-radius: 3px;
+      }
+      .db-field-desc {
+        font-size: 11px;
+        color: var(--gray-400);
+        font-style: italic;
+      }
+
+      .color-user {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+      }
+      .color-mission {
+        background: linear-gradient(135deg, var(--primary), #c0392b);
+      }
+      .color-team {
+        background: linear-gradient(135deg, var(--success), #219a52);
+      }
+      .color-church {
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+      }
+      .color-terms {
+        background: linear-gradient(135deg, var(--warning), #e67e22);
+      }
+      .color-board {
+        background: linear-gradient(135deg, #1abc9c, #16a085);
+      }
+
+      /* ===== RELATIONS ===== */
+      .relations-section {
+        margin-top: 48px;
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--gray-200);
+      }
+      .relations-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        color: var(--secondary);
+      }
+      .relation-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 12px;
+      }
+      .relation-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: var(--radius-sm);
+        background: var(--gray-50);
+        font-size: 13px;
+        border: 1px solid var(--gray-200);
+      }
+      .relation-from,
+      .relation-to {
+        font-weight: 600;
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        font-size: 12px;
+        padding: 3px 8px;
+        border-radius: 4px;
+        color: white;
+      }
+      .relation-arrow {
+        color: var(--gray-400);
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      .relation-type {
+        font-size: 11px;
+        color: var(--gray-500);
+        margin-left: auto;
+        background: var(--gray-200);
+        padding: 2px 8px;
+        border-radius: 10px;
+      }
+
+      /* ===== OVERVIEW (Visual Summary) ===== */
+      .overview-visual {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 40px;
+      }
+      @media (max-width: 768px) {
+        .overview-visual {
+          grid-template-columns: 1fr;
+        }
+      }
+      .overview-card {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--gray-200);
+      }
+      .overview-card h3 {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      .stat-item {
+        text-align: center;
+        padding: 16px;
+        background: var(--gray-50);
+        border-radius: var(--radius-sm);
+      }
+      .stat-number {
+        font-size: 36px;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+      .stat-label {
+        font-size: 12px;
+        color: var(--gray-600);
+        font-weight: 500;
+      }
+
+      /* ===== ROADMAP ===== */
+      .roadmap-container {
+        position: relative;
+      }
+
+      .phase-card {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        margin-bottom: 24px;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--gray-200);
+        transition: transform 0.2s;
+      }
+      .phase-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .phase-header {
+        padding: 24px 28px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .phase-number {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 20px;
+        color: white;
+        flex-shrink: 0;
+      }
+      .phase-info {
+        flex: 1;
+      }
+      .phase-info h3 {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 2px;
+      }
+      .phase-info p {
+        font-size: 13px;
+        color: var(--gray-500);
+      }
+      .phase-status {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+      .status-done {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .status-progress {
+        background: #e3f2fd;
+        color: #1565c0;
+      }
+      .status-planned {
+        background: var(--gray-100);
+        color: var(--gray-600);
+      }
+
+      .phase-body {
+        padding: 0 28px 24px;
+      }
+      .feature-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+      }
+      .feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px 16px;
+        background: var(--gray-50);
+        border-radius: var(--radius-sm);
+        font-size: 14px;
+        border: 1px solid var(--gray-200);
+      }
+      .feature-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .fi-done {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .fi-progress {
+        background: #e3f2fd;
+        color: #1565c0;
+      }
+      .fi-planned {
+        background: var(--gray-200);
+        color: var(--gray-600);
+      }
+
+      .feature-text {
+        flex: 1;
+      }
+      .feature-text strong {
+        display: block;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+      .feature-text span {
+        font-size: 12px;
+        color: var(--gray-500);
+        line-height: 1.4;
+      }
+
+      /* ===== ARCHITECTURE ===== */
+      .arch-diagram {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        padding: 40px;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--gray-200);
+        margin-bottom: 32px;
+      }
+      .arch-title {
+        font-size: 20px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 32px;
+        color: var(--secondary);
+      }
+
+      .arch-layers {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .arch-layer {
+        border-radius: var(--radius-md);
+        padding: 20px 24px;
+        position: relative;
+      }
+      .arch-layer-title {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 12px;
+        opacity: 0.8;
+      }
+      .arch-apps {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .arch-app {
+        padding: 10px 18px;
+        border-radius: var(--radius-sm);
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .arch-app-icon {
+        font-size: 16px;
+      }
+
+      .layer-client {
+        background: linear-gradient(135deg, #ebf5fb, #d6eaf8);
+        color: #1b4f72;
+      }
+      .layer-client .arch-app {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid #aed6f1;
+      }
+      .layer-shared {
+        background: linear-gradient(135deg, #f5eef8, #ebdef0);
+        color: #6c3483;
+      }
+      .layer-shared .arch-app {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid #d2b4de;
+      }
+      .layer-server {
+        background: linear-gradient(135deg, #e8f8f5, #d1f2eb);
+        color: #0e6655;
+      }
+      .layer-server .arch-app {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid #a3e4d7;
+      }
+      .layer-db {
+        background: linear-gradient(135deg, #fef9e7, #fcf3cf);
+        color: #7d6608;
+      }
+      .layer-db .arch-app {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid #f9e79f;
+      }
+
+      .arch-arrow {
+        text-align: center;
+        color: var(--gray-400);
+        font-size: 20px;
+        padding: 4px 0;
+      }
+
+      /* ===== ENUMS SECTION ===== */
+      .enum-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 16px;
+        margin-top: 32px;
+      }
+      .enum-card {
+        background: var(--white);
+        border-radius: var(--radius-md);
+        padding: 18px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-200);
+      }
+      .enum-card h4 {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: var(--secondary);
+        font-family: 'SF Mono', 'Fira Code', monospace;
+      }
+      .enum-value {
+        display: inline-block;
+        padding: 3px 10px;
+        margin: 2px 4px 2px 0;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        background: var(--gray-100);
+        color: var(--gray-700);
+        border: 1px solid var(--gray-200);
+      }
+
+      /* ===== FLOW SECTION ===== */
+      .flow-container {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        padding: 40px;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--gray-200);
+        margin-bottom: 32px;
+      }
+      .flow-title {
+        font-size: 20px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 32px;
+        color: var(--secondary);
+      }
+      .flow-steps {
+        display: flex;
+        align-items: flex-start;
+        gap: 0;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .flow-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 140px;
+        text-align: center;
+      }
+      .flow-step-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 10px;
+        box-shadow: var(--shadow-md);
+      }
+      .flow-step-text {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 3px;
+      }
+      .flow-step-desc {
+        font-size: 11px;
+        color: var(--gray-500);
+        max-width: 120px;
+      }
+      .flow-arrow {
+        font-size: 24px;
+        color: var(--gray-300);
+        margin-top: 16px;
+        padding: 0 4px;
+      }
+
+      /* ===== FOOTER ===== */
+      .footer {
+        text-align: center;
+        padding: 32px;
+        color: var(--gray-500);
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ===== HERO ===== -->
+    <div class="hero">
+      <div class="hero-badge">Missionary Platform</div>
+      <h1>선교 관리 플랫폼</h1>
+      <p>
+        삼일교회 선교 참가 신청부터 팀 관리, 게시판까지<br />선교의 모든 과정을
+        하나의 플랫폼에서
+      </p>
+    </div>
+
+    <!-- ===== NAV ===== -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showSection('overview')">
+        전체 개요
+      </button>
+      <button class="nav-tab" onclick="showSection('db')">데이터 구조</button>
+      <button class="nav-tab" onclick="showSection('roadmap')">
+        개발 로드맵
+      </button>
+      <button class="nav-tab" onclick="showSection('arch')">시스템 구조</button>
+    </div>
+
+    <!-- ============================= -->
+    <!-- SECTION: OVERVIEW             -->
+    <!-- ============================= -->
+    <div class="section active" id="section-overview">
+      <div class="section-header">
+        <h2>프로젝트 전체 개요</h2>
+        <p>현재까지의 개발 진행 상황과 시스템 규모</p>
+      </div>
+
+      <div class="overview-visual">
+        <div class="overview-card">
+          <h3>📊 현재 시스템 규모</h3>
+          <div class="stat-grid">
+            <div class="stat-item">
+              <div class="stat-number" style="color: var(--primary)">16</div>
+              <div class="stat-label">데이터베이스 테이블</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" style="color: var(--accent)">7</div>
+              <div class="stat-label">Enum 타입</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" style="color: var(--success)">4</div>
+              <div class="stat-label">애플리케이션</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" style="color: var(--warning)">8+</div>
+              <div class="stat-label">서버 API 모듈</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="overview-card">
+          <h3>🎯 핵심 기능 요약</h3>
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px;
+                background: var(--gray-50);
+                border-radius: 8px;
+              "
+            >
+              <div style="font-size: 24px">⛪</div>
+              <div>
+                <strong style="font-size: 14px">선교 관리</strong><br /><span
+                  style="font-size: 12px; color: var(--gray-500)"
+                  >선교 생성/수정/삭제, 그룹별 차수 관리</span
+                >
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px;
+                background: var(--gray-50);
+                border-radius: 8px;
+              "
+            >
+              <div style="font-size: 24px">👥</div>
+              <div>
+                <strong style="font-size: 14px">참가 신청</strong><br /><span
+                  style="font-size: 12px; color: var(--gray-500)"
+                  >온라인 신청, 정원 관리, 결제 승인</span
+                >
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px;
+                background: var(--gray-50);
+                border-radius: 8px;
+              "
+            >
+              <div style="font-size: 24px">👨‍👩‍👧‍👦</div>
+              <div>
+                <strong style="font-size: 14px">팀 편성</strong><br /><span
+                  style="font-size: 12px; color: var(--gray-500)"
+                  >교회별 팀 구성, 팀장/팀원 배정</span
+                >
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px;
+                background: var(--gray-50);
+                border-radius: 8px;
+              "
+            >
+              <div style="font-size: 24px">📋</div>
+              <div>
+                <strong style="font-size: 14px">게시판/약관</strong><br /><span
+                  style="font-size: 12px; color: var(--gray-500)"
+                  >공지, 버스, 숙소, FAQ, 일정, 약관 동의</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Flow -->
+      <div class="flow-container">
+        <div class="flow-title">사용자 여정 (User Flow)</div>
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div
+              class="flow-step-icon"
+              style="
+                background: linear-gradient(135deg, #3498db, #2980b9);
+                color: white;
+              "
+            >
+              🔐
+            </div>
+            <div class="flow-step-text">로그인</div>
+            <div class="flow-step-desc">구글/카카오<br />SNS 로그인</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div
+              class="flow-step-icon"
+              style="
+                background: linear-gradient(135deg, var(--primary), #c0392b);
+                color: white;
+              "
+            >
+              ⛪
+            </div>
+            <div class="flow-step-text">선교 조회</div>
+            <div class="flow-step-desc">모집중인<br />선교 확인</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div
+              class="flow-step-icon"
+              style="
+                background: linear-gradient(135deg, #27ae60, #219a52);
+                color: white;
+              "
+            >
+              📝
+            </div>
+            <div class="flow-step-text">참가 신청</div>
+            <div class="flow-step-desc">개인정보 입력<br />신청비 안내</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div
+              class="flow-step-icon"
+              style="
+                background: linear-gradient(135deg, #f39c12, #e67e22);
+                color: white;
+              "
+            >
+              💰
+            </div>
+            <div class="flow-step-text">결제 확인</div>
+            <div class="flow-step-desc">관리자 확인<br />결제 승인</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div
+              class="flow-step-icon"
+              style="
+                background: linear-gradient(135deg, #9b59b6, #8e44ad);
+                color: white;
+              "
+            >
+              👥
+            </div>
+            <div class="flow-step-text">팀 배정</div>
+            <div class="flow-step-desc">교회별<br />팀 편성</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div
+              class="flow-step-icon"
+              style="
+                background: linear-gradient(135deg, #1abc9c, #16a085);
+                color: white;
+              "
+            >
+              📋
+            </div>
+            <div class="flow-step-text">정보 확인</div>
+            <div class="flow-step-desc">버스/숙소<br />일정 확인</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Flow -->
+      <div class="flow-container">
+        <div class="flow-title">관리자 여정 (Admin Flow)</div>
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div
+              class="flow-step-icon"
+              style="
+                background: linear-gradient(135deg, #2c3e50, #1a252f);
+                color: white;
+              "
+            >
+              🔧
+            </div>
+            <div class="flow-step-text">선교 생성</div>
+            <div class="flow-step-desc">이름, 기간, 정원<br />지역 설정</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div
+              class="flow-step-icon"
+              style="
+                background: linear-gradient(135deg, var(--primary), #c0392b);
+                color: white;
+              "
+            >
+              👤
+            </div>
+            <div class="flow-step-text">스탭 지정</div>
+            <div class="flow-step-desc">리더/멤버<br />역할 배정</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div
+              class="flow-step-icon"
+              style="
+                background: linear-gradient(135deg, #27ae60, #219a52);
+                color: white;
+              "
+            >
+              📊
+            </div>
+            <div class="flow-step-text">신청 관리</div>
+            <div class="flow-step-desc">참가자 확인<br />결제 승인</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div
+              class="flow-step-icon"
+              style="
+                background: linear-gradient(135deg, #9b59b6, #8e44ad);
+                color: white;
+              "
+            >
+              👨‍👩‍👧‍👦
+            </div>
+            <div class="flow-step-text">팀 편성</div>
+            <div class="flow-step-desc">교회별 팀<br />팀원 배정</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div
+              class="flow-step-icon"
+              style="
+                background: linear-gradient(135deg, #f39c12, #e67e22);
+                color: white;
+              "
+            >
+              📥
+            </div>
+            <div class="flow-step-text">CSV 다운</div>
+            <div class="flow-step-desc">참가자 명단<br />엑셀 추출</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- SECTION: DB                    -->
+    <!-- ============================= -->
+    <div class="section" id="section-db">
+      <div class="section-header">
+        <h2>데이터베이스 구조</h2>
+        <p>PostgreSQL + Prisma ORM 기반, 총 16개 테이블</p>
+      </div>
+
+      <div class="db-legend">
+        <div class="db-legend-item">
+          <div class="db-legend-dot color-user"></div>
+          사용자/인증
+        </div>
+        <div class="db-legend-item">
+          <div class="db-legend-dot color-mission"></div>
+          선교 핵심
+        </div>
+        <div class="db-legend-item">
+          <div class="db-legend-dot color-team"></div>
+          팀/참가
+        </div>
+        <div class="db-legend-item">
+          <div class="db-legend-dot color-church"></div>
+          교회
+        </div>
+        <div class="db-legend-item">
+          <div class="db-legend-dot color-board"></div>
+          게시판
+        </div>
+        <div class="db-legend-item">
+          <div class="db-legend-dot color-terms"></div>
+          약관
+        </div>
+      </div>
+
+      <!-- USER DOMAIN -->
+      <div class="db-domain-group">
+        <div class="db-domain-title" style="color: #3498db">사용자 & 인증</div>
+        <div class="db-grid">
+          <div class="db-table">
+            <div class="db-table-header color-user">
+              <span>User (사용자)</span><span class="icon">👤</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📧</span
+                ><span class="db-field-name">email</span
+                ><span class="db-field-type">String?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon"></span
+                ><span class="db-field-name">name</span
+                ><span class="db-field-type">String?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔒</span
+                ><span class="db-field-name">password</span
+                ><span class="db-field-type">String?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🌐</span
+                ><span class="db-field-name">provider</span
+                ><span class="db-field-type">AuthProvider</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🎭</span
+                ><span class="db-field-name">role</span
+                ><span class="db-field-type">UserRole</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📱</span
+                ><span class="db-field-name">phoneNumber</span
+                ><span class="db-field-type">String?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🎂</span
+                ><span class="db-field-name">birthDate</span
+                ><span class="db-field-type">DateTime?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">⚧</span
+                ><span class="db-field-name">gender</span
+                ><span class="db-field-type">String?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">✝️</span
+                ><span class="db-field-name">isBaptized</span
+                ><span class="db-field-type">Boolean</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🗑️</span
+                ><span class="db-field-name">deletedAt</span
+                ><span class="db-field-desc">소프트 삭제</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MISSION DOMAIN -->
+      <div class="db-domain-group">
+        <div class="db-domain-title" style="color: var(--primary)">
+          선교 핵심
+        </div>
+        <div class="db-grid">
+          <div class="db-table">
+            <div class="db-table-header color-mission">
+              <span>MissionGroup (선교 그룹)</span><span class="icon">📁</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon"></span
+                ><span class="db-field-name">name</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📝</span
+                ><span class="db-field-name">description</span
+                ><span class="db-field-type">Text?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🗂️</span
+                ><span class="db-field-name">type</span
+                ><span class="db-field-type">RegionType</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🗑️</span
+                ><span class="db-field-name">deletedAt</span
+                ><span class="db-field-desc">소프트 삭제</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="db-table">
+            <div class="db-table-header color-mission">
+              <span>Missionary (선교)</span><span class="icon">⛪</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon"></span
+                ><span class="db-field-name">name</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📅</span
+                ><span class="db-field-name">startDate ~ endDate</span
+                ><span class="db-field-type">DateTime</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">👨‍💼</span
+                ><span class="db-field-name">pastorName / Phone</span
+                ><span class="db-field-type">String?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📅</span
+                ><span class="db-field-name">참가신청 시작 ~ 종료</span
+                ><span class="db-field-type">DateTime?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">💰</span
+                ><span class="db-field-name">price</span
+                ><span class="db-field-type">Int?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">👥</span
+                ><span class="db-field-name">최대/현재 참가인원</span
+                ><span class="db-field-type">Int</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🏦</span
+                ><span class="db-field-name">계좌 정보</span
+                ><span class="db-field-type">String?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📊</span
+                ><span class="db-field-name">status</span
+                ><span class="db-field-type">MissionStatus</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">regionId</span
+                ><span class="db-field-desc">지역 FK</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">missionGroupId</span
+                ><span class="db-field-desc">그룹 FK</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">#️⃣</span
+                ><span class="db-field-name">order</span
+                ><span class="db-field-desc">차수 (1차, 2차...)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="db-table">
+            <div class="db-table-header color-mission">
+              <span>MissionaryRegion (지역)</span><span class="icon">🗺️</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon"></span
+                ><span class="db-field-name">name</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🗂️</span
+                ><span class="db-field-name">type</span
+                ><span class="db-field-type">DOMESTIC | ABROAD</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="db-table">
+            <div class="db-table-header color-mission">
+              <span>MissionaryStaff (스탭)</span><span class="icon">🧑‍💼</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🎭</span
+                ><span class="db-field-name">role</span
+                ><span class="db-field-type">LEADER | MEMBER</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">missionaryId</span
+                ><span class="db-field-desc">선교 FK</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">userId</span
+                ><span class="db-field-desc">사용자 FK</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="db-table">
+            <div class="db-table-header color-mission">
+              <span>MissionaryPoster (포스터)</span><span class="icon">🖼️</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon"></span
+                ><span class="db-field-name">name</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📂</span
+                ><span class="db-field-name">path</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">missionaryId</span
+                ><span class="db-field-desc">선교 FK</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="db-table">
+            <div class="db-table-header color-mission">
+              <span>MissionaryChurch (선교교회)</span
+              ><span class="icon">🏠</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon"></span
+                ><span class="db-field-name">name</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📌</span
+                ><span class="db-field-name">visitPurpose</span
+                ><span class="db-field-type">String?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">👨‍💼</span
+                ><span class="db-field-name">pastor 정보</span
+                ><span class="db-field-type">String?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📍</span
+                ><span class="db-field-name">address 정보</span
+                ><span class="db-field-type">String?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">missionaryId</span
+                ><span class="db-field-desc">선교 FK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEAM/PARTICIPATION DOMAIN -->
+      <div class="db-domain-group">
+        <div class="db-domain-title" style="color: var(--success)">
+          팀 & 참가
+        </div>
+        <div class="db-grid">
+          <div class="db-table">
+            <div class="db-table-header color-team">
+              <span>Participation (참가)</span><span class="icon">📝</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon"></span
+                ><span class="db-field-name">name</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🎂</span
+                ><span class="db-field-name">birthDate</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">💰</span
+                ><span class="db-field-name">applyFee</span
+                ><span class="db-field-type">Int?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">✅</span
+                ><span class="db-field-name">isPaid</span
+                ><span class="db-field-type">Boolean</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔒</span
+                ><span class="db-field-name">identificationNumber</span
+                ><span class="db-field-desc">AES 암호화</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🚗</span
+                ><span class="db-field-name">isOwnCar</span
+                ><span class="db-field-type">Boolean</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">missionaryId, userId, teamId</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="db-table">
+            <div class="db-table-header color-team">
+              <span>Team (팀)</span><span class="icon">👨‍👩‍👧‍👦</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon"></span
+                ><span class="db-field-name">teamName</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">👑</span
+                ><span class="db-field-name">leaderUserId / Name</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">missionaryId</span
+                ><span class="db-field-desc">선교 FK</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">churchId</span
+                ><span class="db-field-desc">교회 FK</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="db-table">
+            <div class="db-table-header color-team">
+              <span>TeamMember (팀원)</span><span class="icon">👤</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">teamId</span
+                ><span class="db-field-desc">팀 FK</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">userId</span
+                ><span class="db-field-desc">사용자 FK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHURCH DOMAIN -->
+      <div class="db-domain-group">
+        <div class="db-domain-title" style="color: #9b59b6">교회</div>
+        <div class="db-grid">
+          <div class="db-table">
+            <div class="db-table-header color-church">
+              <span>Church (교회)</span><span class="icon">⛪</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon"></span
+                ><span class="db-field-name">name</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">👨‍💼</span
+                ><span class="db-field-name">pastorName / Phone</span
+                ><span class="db-field-type">String?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📍</span
+                ><span class="db-field-name">addressBasic / Detail</span
+                ><span class="db-field-type">String?</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOARD DOMAIN -->
+      <div class="db-domain-group">
+        <div class="db-domain-title" style="color: #1abc9c">게시판</div>
+        <div class="db-grid">
+          <div class="db-table">
+            <div class="db-table-header color-board">
+              <span>MissionaryBoard (게시판)</span><span class="icon">📋</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🗂️</span
+                ><span class="db-field-name">type</span
+                ><span class="db-field-type">BoardType</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon"></span
+                ><span class="db-field-name">title</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📝</span
+                ><span class="db-field-name">content</span
+                ><span class="db-field-type">Text</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">missionaryId</span
+                ><span class="db-field-desc">선교 FK</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="db-table">
+            <div class="db-table-header color-board">
+              <span>MissionaryBoardFile (첨부)</span
+              ><span class="icon">📎</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon"></span
+                ><span class="db-field-name">name</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📂</span
+                ><span class="db-field-name">path</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">boardId</span
+                ><span class="db-field-desc">게시판 FK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TERMS DOMAIN -->
+      <div class="db-domain-group">
+        <div class="db-domain-title" style="color: var(--warning)">약관</div>
+        <div class="db-grid">
+          <div class="db-table">
+            <div class="db-table-header color-terms">
+              <span>Terms (약관)</span><span class="icon">📜</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🗂️</span
+                ><span class="db-field-name">termsType</span
+                ><span class="db-field-type">TermsType</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon"></span
+                ><span class="db-field-name">termsTitle</span
+                ><span class="db-field-type">String</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">✅</span
+                ><span class="db-field-name">isEssential</span
+                ><span class="db-field-type">Boolean</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📊</span
+                ><span class="db-field-name">isUsed / seq</span
+                ><span class="db-field-type">Boolean / Int</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="db-table">
+            <div class="db-table-header color-terms">
+              <span>TermsContent (약관 내용)</span><span class="icon">📄</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🗂️</span
+                ><span class="db-field-name">termsType</span
+                ><span class="db-field-type">TermsType</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📝</span
+                ><span class="db-field-name">termsContents</span
+                ><span class="db-field-type">Text</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📅</span
+                ><span class="db-field-name">termsApplyAt</span
+                ><span class="db-field-type">DateTime</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="db-table">
+            <div class="db-table-header color-terms">
+              <span>UserTermsAgreement (동의)</span><span class="icon">✅</span>
+            </div>
+            <div class="db-table-body">
+              <div class="db-field">
+                <span class="db-field-icon">🔑</span
+                ><span class="db-field-name">id</span
+                ><span class="db-field-type">UUID</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">✅</span
+                ><span class="db-field-name">isAgreed</span
+                ><span class="db-field-type">Boolean</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">userId</span
+                ><span class="db-field-desc">사용자 FK</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">termsId</span
+                ><span class="db-field-desc">약관 FK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENUMS -->
+      <div style="margin-top: 48px">
+        <div class="section-header">
+          <h2 style="font-size: 24px">Enum (상태/유형 값)</h2>
+        </div>
+        <div class="enum-grid">
+          <div class="enum-card">
+            <h4>AuthProvider</h4>
+            <span class="enum-value">LOCAL</span>
+            <span class="enum-value">GOOGLE</span>
+            <span class="enum-value">KAKAO</span>
+          </div>
+          <div class="enum-card">
+            <h4>UserRole</h4>
+            <span class="enum-value">USER</span>
+            <span class="enum-value">ADMIN</span>
+            <span class="enum-value">STAFF</span>
+          </div>
+          <div class="enum-card">
+            <h4>MissionaryRegionType</h4>
+            <span class="enum-value">DOMESTIC (국내)</span>
+            <span class="enum-value">ABROAD (해외)</span>
+          </div>
+          <div class="enum-card">
+            <h4>MissionStatus</h4>
+            <span class="enum-value">RECRUITING (모집중)</span>
+            <span class="enum-value">IN_PROGRESS (진행중)</span>
+            <span class="enum-value">COMPLETED (완료)</span>
+          </div>
+          <div class="enum-card">
+            <h4>MissionaryBoardType</h4>
+            <span class="enum-value">NOTICE (공지)</span>
+            <span class="enum-value">BUS (버스)</span>
+            <span class="enum-value">ACCOMMODATION (숙소)</span>
+            <span class="enum-value">FAQ</span>
+            <span class="enum-value">SCHEDULE (일정)</span>
+          </div>
+          <div class="enum-card">
+            <h4>MissionaryStaffRole</h4>
+            <span class="enum-value">LEADER (리더)</span>
+            <span class="enum-value">MEMBER (멤버)</span>
+          </div>
+          <div class="enum-card">
+            <h4>TermsType</h4>
+            <span class="enum-value">서비스 이용약관</span>
+            <span class="enum-value">개인정보 처리방침</span>
+            <span class="enum-value">개인정보 이용동의</span>
+            <span class="enum-value">제3자 제공동의</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RELATIONS -->
+      <div class="relations-section">
+        <div class="relations-title">테이블 간 관계 (Relationships)</div>
+        <div class="relation-grid">
+          <div class="relation-item">
+            <span class="relation-from color-mission">MissionGroup</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-mission">Missionary</span>
+            <span class="relation-type">1 : N</span>
+          </div>
+          <div class="relation-item">
+            <span class="relation-from color-mission">MissionaryRegion</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-mission">Missionary</span>
+            <span class="relation-type">1 : N</span>
+          </div>
+          <div class="relation-item">
+            <span class="relation-from color-user">User</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-mission">Missionary</span>
+            <span class="relation-type">1 : N (생성자)</span>
+          </div>
+          <div class="relation-item">
+            <span class="relation-from color-mission">Missionary</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-mission">MissionaryStaff</span>
+            <span class="relation-type">1 : N</span>
+          </div>
+          <div class="relation-item">
+            <span class="relation-from color-mission">Missionary</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-mission">MissionaryPoster</span>
+            <span class="relation-type">1 : N</span>
+          </div>
+          <div class="relation-item">
+            <span class="relation-from color-mission">Missionary</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-mission">MissionaryChurch</span>
+            <span class="relation-type">1 : N</span>
+          </div>
+          <div class="relation-item">
+            <span class="relation-from color-mission">Missionary</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-board">MissionaryBoard</span>
+            <span class="relation-type">1 : N</span>
+          </div>
+          <div class="relation-item">
+            <span class="relation-from color-board">MissionaryBoard</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-board">BoardFile</span>
+            <span class="relation-type">1 : N</span>
+          </div>
+          <div class="relation-item">
+            <span class="relation-from color-mission">Missionary</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-team">Participation</span>
+            <span class="relation-type">1 : N</span>
+          </div>
+          <div class="relation-item">
+            <span class="relation-from color-user">User</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-team">Participation</span>
+            <span class="relation-type">1 : N</span>
+          </div>
+          <div class="relation-item">
+            <span class="relation-from color-mission">Missionary</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-team">Team</span>
+            <span class="relation-type">1 : N</span>
+          </div>
+          <div class="relation-item">
+            <span class="relation-from color-church">Church</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-team">Team</span>
+            <span class="relation-type">1 : N</span>
+          </div>
+          <div class="relation-item">
+            <span class="relation-from color-team">Team</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-team">TeamMember</span>
+            <span class="relation-type">1 : N</span>
+          </div>
+          <div class="relation-item">
+            <span class="relation-from color-user">User</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-terms">UserTermsAgreement</span>
+            <span class="relation-type">1 : N</span>
+          </div>
+          <div class="relation-item">
+            <span class="relation-from color-terms">Terms</span>
+            <span class="relation-arrow">→</span>
+            <span class="relation-to color-terms">UserTermsAgreement</span>
+            <span class="relation-type">1 : N</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- SECTION: ROADMAP              -->
+    <!-- ============================= -->
+    <div class="section" id="section-roadmap">
+      <div class="section-header">
+        <h2>개발 로드맵</h2>
+        <p>완료된 작업과 앞으로의 개발 계획</p>
+      </div>
+
+      <div class="roadmap-container">
+        <!-- PHASE 1: DONE -->
+        <div class="phase-card">
+          <div class="phase-header">
+            <div class="phase-number" style="background: var(--success)">1</div>
+            <div class="phase-info">
+              <h3>서버 인프라 & DB 설계</h3>
+              <p>Spring Boot에서 NestJS로 전체 마이그레이션</p>
+            </div>
+            <span class="phase-status status-done">완료</span>
+          </div>
+          <div class="phase-body">
+            <div class="feature-list">
+              <div class="feature-item">
+                <div class="feature-icon fi-done">✓</div>
+                <div class="feature-text">
+                  <strong>Prisma 스키마 설계</strong
+                  ><span>16개 테이블, UUID 기반, Soft Delete</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-done">✓</div>
+                <div class="feature-text">
+                  <strong>RBAC 인증/인가</strong
+                  ><span>JWT + Roles Guard (USER/ADMIN/STAFF)</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-done">✓</div>
+                <div class="feature-text">
+                  <strong>AES 암호화</strong
+                  ><span>주민번호 등 민감정보 암호화 저장</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-done">✓</div>
+                <div class="feature-text">
+                  <strong>전체 도메인 API</strong
+                  ><span>선교, 참가, 팀, 스탭, 교회, 게시판, 약관</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-done">✓</div>
+                <div class="feature-text">
+                  <strong>BullMQ 비동기 처리</strong
+                  ><span>참가 신청 비동기 큐 처리</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-done">✓</div>
+                <div class="feature-text">
+                  <strong>CSV 다운로드</strong
+                  ><span>참가자 명단 엑셀 추출 (UTF-8)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHASE 2: DONE -->
+        <div class="phase-card">
+          <div class="phase-header">
+            <div class="phase-number" style="background: var(--success)">2</div>
+            <div class="phase-info">
+              <h3>어드민 앱 기본 기능</h3>
+              <p>선교 CRUD, 인증, 사이드바</p>
+            </div>
+            <span class="phase-status status-done">완료</span>
+          </div>
+          <div class="phase-body">
+            <div class="feature-list">
+              <div class="feature-item">
+                <div class="feature-icon fi-done">✓</div>
+                <div class="feature-text">
+                  <strong>관리자 로그인</strong
+                  ><span>이메일/비밀번호 + Google/Kakao OAuth</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-done">✓</div>
+                <div class="feature-text">
+                  <strong>선교 CRUD 페이지</strong
+                  ><span>생성/수정/삭제/리스트 (DatePicker, Select)</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-done">✓</div>
+                <div class="feature-text">
+                  <strong>MissionGroup 차수 관리</strong
+                  ><span>"군선교 1차, 2차..." 자동 차수 증가</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-done">✓</div>
+                <div class="feature-text">
+                  <strong>동적 사이드바</strong
+                  ><span>API 연동으로 선교 목록 실시간 표시</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-done">✓</div>
+                <div class="feature-text">
+                  <strong>디자인 시스템</strong
+                  ><span>InputField, Button, Select, DatePicker, Badge...</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-done">✓</div>
+                <div class="feature-text">
+                  <strong>컬러 시스템 개편</strong
+                  ><span>삼일교회 브랜드 컬러 기반 리디자인</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHASE 3: IN PROGRESS -->
+        <div class="phase-card">
+          <div class="phase-header">
+            <div class="phase-number" style="background: var(--accent)">3</div>
+            <div class="phase-info">
+              <h3>어드민 앱 고급 기능</h3>
+              <p>참가 관리, 팀 편성, 게시판</p>
+            </div>
+            <span class="phase-status status-progress">진행 예정</span>
+          </div>
+          <div class="phase-body">
+            <div class="feature-list">
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>참가 신청 관리</strong
+                  ><span>참가자 목록, 결제 승인, CSV 다운로드</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>팀 편성 관리</strong
+                  ><span>교회별 팀 구성, 팀장/팀원 배정</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>스탭 관리</strong
+                  ><span>선교별 리더/멤버 스탭 지정</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>게시판 관리</strong
+                  ><span>공지, 버스, 숙소, FAQ, 일정 게시판</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>교회 관리</strong
+                  ><span>교회 등록/수정, 선교 교회 연결</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>약관 관리</strong
+                  ><span>약관 등록/수정, 필수/선택 설정</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHASE 4: PLANNED -->
+        <div class="phase-card">
+          <div class="phase-header">
+            <div class="phase-number" style="background: var(--gray-400)">
+              4
+            </div>
+            <div class="phase-info">
+              <h3>사용자 앱 (missionary-app)</h3>
+              <p>일반 사용자를 위한 참가 신청 앱</p>
+            </div>
+            <span class="phase-status status-planned">계획됨</span>
+          </div>
+          <div class="phase-body">
+            <div class="feature-list">
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>SNS 로그인</strong
+                  ><span>Google/Kakao 소셜 로그인 (사용자 앱)</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>선교 목록 조회</strong
+                  ><span>모집중인 선교 카드형 리스트</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>선교 상세 페이지</strong
+                  ><span>포스터, 기간, 교역자, 신청 기간 확인</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>참가 신청 폼</strong
+                  ><span>개인정보 입력, 약관 동의, 신청 제출</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>내 참가 현황</strong
+                  ><span>신청 내역, 결제 상태, 팀 배정 확인</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>선교 정보 게시판</strong
+                  ><span>공지/버스/숙소/일정 조회</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHASE 5: PLANNED -->
+        <div class="phase-card">
+          <div class="phase-header">
+            <div class="phase-number" style="background: var(--gray-400)">
+              5
+            </div>
+            <div class="phase-info">
+              <h3>고도화 & 운영</h3>
+              <p>파일 업로드, 알림, 배포</p>
+            </div>
+            <span class="phase-status status-planned">계획됨</span>
+          </div>
+          <div class="phase-body">
+            <div class="feature-list">
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>파일 업로드</strong
+                  ><span>포스터/게시판 첨부파일 (S3 스토리지)</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>푸시 알림</strong
+                  ><span>신청 승인, 팀 배정, 공지 알림</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>대시보드 통계</strong
+                  ><span>선교별 참가자 수, 결제 현황 차트</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>CI/CD 파이프라인</strong
+                  ><span>자동 빌드/테스트/배포</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>도메인 & SSL</strong
+                  ><span>프로덕션 도메인 연결, HTTPS</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-text">
+                  <strong>모니터링</strong
+                  ><span>에러 트래킹, 성능 모니터링</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- SECTION: ARCHITECTURE         -->
+    <!-- ============================= -->
+    <div class="section" id="section-arch">
+      <div class="section-header">
+        <h2>시스템 아키텍처</h2>
+        <p>모노레포 구조와 기술 스택</p>
+      </div>
+
+      <div class="arch-diagram">
+        <div class="arch-title">시스템 전체 구조도</div>
+        <div class="arch-layers">
+          <div class="arch-layer layer-client">
+            <div class="arch-layer-title">클라이언트 (사용자가 보는 화면)</div>
+            <div class="arch-apps">
+              <div class="arch-app">
+                <span class="arch-app-icon">👤</span>missionary-app<br /><span
+                  style="font-size: 11px; opacity: 0.7"
+                  >사용자 앱 (Next.js 16)</span
+                >
+              </div>
+              <div class="arch-app">
+                <span class="arch-app-icon">🔧</span>missionary-admin<br /><span
+                  style="font-size: 11px; opacity: 0.7"
+                  >관리자 앱 (Next.js 16)</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-arrow">⬇ 컴포넌트 공유 ⬇</div>
+
+          <div class="arch-layer layer-shared">
+            <div class="arch-layer-title">공유 라이브러리 (UI 부품 모음)</div>
+            <div class="arch-apps">
+              <div class="arch-app">
+                <span class="arch-app-icon">🎨</span
+                >@samilhero/design-system<br /><span
+                  style="font-size: 11px; opacity: 0.7"
+                  >버튼, 입력창, 달력 등 공통 UI</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-arrow">⬇ API 통신 (HTTP) ⬇</div>
+
+          <div class="arch-layer layer-server">
+            <div class="arch-layer-title">서버 (데이터 처리 엔진)</div>
+            <div class="arch-apps">
+              <div class="arch-app">
+                <span class="arch-app-icon">⚙️</span
+                >missionary-server<br /><span
+                  style="font-size: 11px; opacity: 0.7"
+                  >NestJS 11 + Prisma ORM</span
+                >
+              </div>
+              <div class="arch-app">
+                <span class="arch-app-icon">📨</span>BullMQ<br /><span
+                  style="font-size: 11px; opacity: 0.7"
+                  >비동기 작업 처리 (Redis)</span
+                >
+              </div>
+              <div class="arch-app">
+                <span class="arch-app-icon">⏰</span>Scheduler<br /><span
+                  style="font-size: 11px; opacity: 0.7"
+                  >민감정보 자동 정리</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-arrow">⬇ 데이터 저장/조회 ⬇</div>
+
+          <div class="arch-layer layer-db">
+            <div class="arch-layer-title">데이터베이스</div>
+            <div class="arch-apps">
+              <div class="arch-app">
+                <span class="arch-app-icon">🗄️</span>PostgreSQL<br /><span
+                  style="font-size: 11px; opacity: 0.7"
+                  >메인 데이터베이스 (16 테이블)</span
+                >
+              </div>
+              <div class="arch-app">
+                <span class="arch-app-icon">🔴</span>Redis<br /><span
+                  style="font-size: 11px; opacity: 0.7"
+                  >작업 큐, 캐시</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tech Stack -->
+      <div class="overview-visual">
+        <div class="overview-card">
+          <h3>🖥️ 프론트엔드 기술</h3>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px;
+                background: var(--gray-50);
+                border-radius: 8px;
+              "
+            >
+              <span style="font-size: 20px">⚛️</span>
+              <div>
+                <strong>React 19</strong><br /><span
+                  style="font-size: 12px; color: var(--gray-500)"
+                  >UI 렌더링 라이브러리</span
+                >
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px;
+                background: var(--gray-50);
+                border-radius: 8px;
+              "
+            >
+              <span style="font-size: 20px">▲</span>
+              <div>
+                <strong>Next.js 16</strong><br /><span
+                  style="font-size: 12px; color: var(--gray-500)"
+                  >서버사이드 렌더링, 라우팅</span
+                >
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px;
+                background: var(--gray-50);
+                border-radius: 8px;
+              "
+            >
+              <span style="font-size: 20px">🎨</span>
+              <div>
+                <strong>Tailwind CSS 4</strong><br /><span
+                  style="font-size: 12px; color: var(--gray-500)"
+                  >유틸리티 기반 스타일링</span
+                >
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px;
+                background: var(--gray-50);
+                border-radius: 8px;
+              "
+            >
+              <span style="font-size: 20px">📖</span>
+              <div>
+                <strong>Storybook 8.6</strong><br /><span
+                  style="font-size: 12px; color: var(--gray-500)"
+                  >UI 컴포넌트 문서화</span
+                >
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px;
+                background: var(--gray-50);
+                border-radius: 8px;
+              "
+            >
+              <span style="font-size: 20px">🧪</span>
+              <div>
+                <strong>Vitest</strong><br /><span
+                  style="font-size: 12px; color: var(--gray-500)"
+                  >프론트엔드 테스트</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="overview-card">
+          <h3>⚙️ 백엔드 기술</h3>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px;
+                background: var(--gray-50);
+                border-radius: 8px;
+              "
+            >
+              <span style="font-size: 20px">🦅</span>
+              <div>
+                <strong>NestJS 11</strong><br /><span
+                  style="font-size: 12px; color: var(--gray-500)"
+                  >엔터프라이즈급 Node.js 프레임워크</span
+                >
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px;
+                background: var(--gray-50);
+                border-radius: 8px;
+              "
+            >
+              <span style="font-size: 20px">🔷</span>
+              <div>
+                <strong>Prisma ORM</strong><br /><span
+                  style="font-size: 12px; color: var(--gray-500)"
+                  >타입 안전한 데이터베이스 접근</span
+                >
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px;
+                background: var(--gray-50);
+                border-radius: 8px;
+              "
+            >
+              <span style="font-size: 20px">🐘</span>
+              <div>
+                <strong>PostgreSQL</strong><br /><span
+                  style="font-size: 12px; color: var(--gray-500)"
+                  >안정적인 관계형 데이터베이스</span
+                >
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px;
+                background: var(--gray-50);
+                border-radius: 8px;
+              "
+            >
+              <span style="font-size: 20px">🔴</span>
+              <div>
+                <strong>Redis + BullMQ</strong><br /><span
+                  style="font-size: 12px; color: var(--gray-500)"
+                  >메시지 큐, 비동기 처리</span
+                >
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px;
+                background: var(--gray-50);
+                border-radius: 8px;
+              "
+            >
+              <span style="font-size: 20px">🔐</span>
+              <div>
+                <strong>Passport.js + JWT</strong><br /><span
+                  style="font-size: 12px; color: var(--gray-500)"
+                  >인증/인가 (OAuth, RBAC)</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="footer">
+      Missionary Platform &mdash; 삼일교회 선교 관리 시스템 &middot; 2025
+    </div>
+
+    <script>
+      function showSection(id) {
+        document
+          .querySelectorAll('.section')
+          .forEach((s) => s.classList.remove('active'));
+        document
+          .querySelectorAll('.nav-tab')
+          .forEach((t) => t.classList.remove('active'));
+        document.getElementById('section-' + id).classList.add('active');
+        event.target.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    </script>
+  </body>
+</html>
