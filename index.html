@@ -784,7 +784,7 @@
           <h3>📊 현재 시스템 규모</h3>
           <div class="stat-grid">
             <div class="stat-item">
-              <div class="stat-number" style="color: var(--primary)">16</div>
+              <div class="stat-number" style="color: var(--primary)">15</div>
               <div class="stat-label">데이터베이스 테이블</div>
             </div>
             <div class="stat-item">
@@ -876,6 +876,10 @@
                   >공지, 버스, 숙소, FAQ, 일정, 약관 동의</span
                 >
               </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--gray-50);border-radius:8px">
+              <div style="font-size:24px">👤</div>
+              <div><strong style="font-size:14px">사용자 관리</strong><br><span style="font-size:12px;color:var(--gray-500)">사용자 목록 조회, 상세 정보 편집, 역할 관리</span></div>
             </div>
           </div>
         </div>
@@ -1054,7 +1058,7 @@
     <div class="section" id="section-db">
       <div class="section-header">
         <h2>데이터베이스 구조</h2>
-        <p>PostgreSQL + Prisma ORM 기반, 총 16개 테이블</p>
+        <p>PostgreSQL + Prisma ORM 기반, 총 15개 테이블</p>
       </div>
 
       <div class="db-legend">
@@ -1244,11 +1248,6 @@
               </div>
               <div class="db-field">
                 <span class="db-field-icon">🔗</span
-                ><span class="db-field-name">regionId</span
-                ><span class="db-field-desc">지역 FK</span>
-              </div>
-              <div class="db-field">
-                <span class="db-field-icon">🔗</span
                 ><span class="db-field-name">missionGroupId</span
                 ><span class="db-field-desc">그룹 FK</span>
               </div>
@@ -1276,9 +1275,25 @@
                 ><span class="db-field-type">String</span>
               </div>
               <div class="db-field">
-                <span class="db-field-icon">🗂️</span
-                ><span class="db-field-name">type</span
-                ><span class="db-field-type">DOMESTIC | ABROAD</span>
+                <span class="db-field-icon">📌</span
+                ><span class="db-field-name">visitPurpose</span
+                ><span class="db-field-type">String?</span
+                ><span class="db-field-desc">방문 목적</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">👨‍💼</span
+                ><span class="db-field-name">pastorName / Phone</span
+                ><span class="db-field-type">String?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📍</span
+                ><span class="db-field-name">addressBasic / Detail</span
+                ><span class="db-field-type">String?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">missionaryId</span
+                ><span class="db-field-desc">선교 FK</span>
               </div>
             </div>
           </div>
@@ -1339,44 +1354,6 @@
             </div>
           </div>
 
-          <div class="db-table">
-            <div class="db-table-header color-mission">
-              <span>MissionaryChurch (선교교회)</span
-              ><span class="icon">🏠</span>
-            </div>
-            <div class="db-table-body">
-              <div class="db-field">
-                <span class="db-field-icon">🔑</span
-                ><span class="db-field-name">id</span
-                ><span class="db-field-type">UUID</span>
-              </div>
-              <div class="db-field">
-                <span class="db-field-icon"></span
-                ><span class="db-field-name">name</span
-                ><span class="db-field-type">String</span>
-              </div>
-              <div class="db-field">
-                <span class="db-field-icon">📌</span
-                ><span class="db-field-name">visitPurpose</span
-                ><span class="db-field-type">String?</span>
-              </div>
-              <div class="db-field">
-                <span class="db-field-icon">👨‍💼</span
-                ><span class="db-field-name">pastor 정보</span
-                ><span class="db-field-type">String?</span>
-              </div>
-              <div class="db-field">
-                <span class="db-field-icon">📍</span
-                ><span class="db-field-name">address 정보</span
-                ><span class="db-field-type">String?</span>
-              </div>
-              <div class="db-field">
-                <span class="db-field-icon">🔗</span
-                ><span class="db-field-name">missionaryId</span
-                ><span class="db-field-desc">선교 FK</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -1618,6 +1595,16 @@
                 ><span class="db-field-type">String</span>
               </div>
               <div class="db-field">
+                <span class="db-field-icon">🔗</span
+                ><span class="db-field-name">termsUrl</span
+                ><span class="db-field-type">String?</span>
+              </div>
+              <div class="db-field">
+                <span class="db-field-icon">📝</span
+                ><span class="db-field-name">termsDescription</span
+                ><span class="db-field-type">Text?</span>
+              </div>
+              <div class="db-field">
                 <span class="db-field-icon">✅</span
                 ><span class="db-field-name">isEssential</span
                 ><span class="db-field-type">Boolean</span>
@@ -1707,13 +1694,14 @@
             <span class="enum-value">STAFF</span>
           </div>
           <div class="enum-card">
-            <h4>MissionaryRegionType</h4>
+            <h4>MissionaryCategory</h4>
             <span class="enum-value">DOMESTIC (국내)</span>
             <span class="enum-value">ABROAD (해외)</span>
           </div>
           <div class="enum-card">
             <h4>MissionStatus</h4>
-            <span class="enum-value">RECRUITING (모집중)</span>
+            <span class="enum-value">ENROLLMENT_OPENED (모집중)</span>
+            <span class="enum-value">ENROLLMENT_CLOSED (모집마감)</span>
             <span class="enum-value">IN_PROGRESS (진행중)</span>
             <span class="enum-value">COMPLETED (완료)</span>
           </div>
@@ -1751,12 +1739,6 @@
             <span class="relation-type">1 : N</span>
           </div>
           <div class="relation-item">
-            <span class="relation-from color-mission">MissionaryRegion</span>
-            <span class="relation-arrow">→</span>
-            <span class="relation-to color-mission">Missionary</span>
-            <span class="relation-type">1 : N</span>
-          </div>
-          <div class="relation-item">
             <span class="relation-from color-user">User</span>
             <span class="relation-arrow">→</span>
             <span class="relation-to color-mission">Missionary</span>
@@ -1777,7 +1759,7 @@
           <div class="relation-item">
             <span class="relation-from color-mission">Missionary</span>
             <span class="relation-arrow">→</span>
-            <span class="relation-to color-mission">MissionaryChurch</span>
+            <span class="relation-to color-mission">MissionaryRegion</span>
             <span class="relation-type">1 : N</span>
           </div>
           <div class="relation-item">
@@ -1864,7 +1846,7 @@
                 <div class="feature-icon fi-done">✓</div>
                 <div class="feature-text">
                   <strong>Prisma 스키마 설계</strong
-                  ><span>16개 테이블, UUID 기반, Soft Delete</span>
+                  ><span>15개 테이블, UUID 기반, Soft Delete</span>
                 </div>
               </div>
               <div class="feature-item">
@@ -1960,6 +1942,13 @@
                   ><span>삼일교회 브랜드 컬러 기반 리디자인</span>
                 </div>
               </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-done">✓</div>
+                <div class="feature-text">
+                  <strong>사용자 관리 페이지</strong
+                  ><span>사용자 목록 조회, 상세 편집 패널</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1972,7 +1961,7 @@
               <h3>어드민 앱 고급 기능</h3>
               <p>참가 관리, 팀 편성, 게시판</p>
             </div>
-            <span class="phase-status status-progress">진행 예정</span>
+            <span class="phase-status status-progress">진행중</span>
           </div>
           <div class="phase-body">
             <div class="feature-list">
@@ -2037,10 +2026,17 @@
           <div class="phase-body">
             <div class="feature-list">
               <div class="feature-item">
-                <div class="feature-icon fi-planned">○</div>
+                <div class="feature-icon fi-progress">◐</div>
                 <div class="feature-text">
                   <strong>SNS 로그인</strong
-                  ><span>Google/Kakao 소셜 로그인 (사용자 앱)</span>
+                  ><span>Google/Kakao 소셜 로그인 + 회원가입 구현</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon fi-done">✓</div>
+                <div class="feature-text">
+                  <strong>회원가입 & 비밀번호 변경</strong
+                  ><span>회원가입, 로그인, 비밀번호 변경 페이지 구현</span>
                 </div>
               </div>
               <div class="feature-item">
@@ -2213,6 +2209,7 @@
                   >민감정보 자동 정리</span
                 >
               </div>
+              <div class="arch-app"><span class="arch-app-icon">📘</span>Swagger<br><span style="font-size:11px;opacity:0.7">API 자동 문서화</span></div>
             </div>
           </div>
 
@@ -2224,7 +2221,7 @@
               <div class="arch-app">
                 <span class="arch-app-icon">🗄️</span>PostgreSQL<br /><span
                   style="font-size: 11px; opacity: 0.7"
-                  >메인 데이터베이스 (16 테이블)</span
+                  >메인 데이터베이스 (15 테이블)</span
                 >
               </div>
               <div class="arch-app">
@@ -2333,6 +2330,10 @@
                 >
               </div>
             </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--gray-50);border-radius:8px">
+              <span style="font-size:20px">⚡</span>
+              <div><strong>React Compiler</strong><br><span style="font-size:12px;color:var(--gray-500)">자동 메모이제이션 (useMemo/useCallback 불필요)</span></div>
+            </div>
           </div>
         </div>
 
@@ -2429,6 +2430,10 @@
                 >
               </div>
             </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--gray-50);border-radius:8px">
+              <span style="font-size:20px">📘</span>
+              <div><strong>Swagger (OpenAPI)</strong><br><span style="font-size:12px;color:var(--gray-500)">API 자동 문서화</span></div>
+            </div>
           </div>
         </div>
       </div>
@@ -2436,7 +2441,7 @@
 
     <!-- ===== FOOTER ===== -->
     <div class="footer">
-      Missionary Platform &mdash; 삼일교회 선교 관리 시스템 &middot; 2025
+      Missionary Platform &mdash; 삼일교회 선교 관리 시스템 &middot; 2025 ~ 2026
     </div>
 
     <script>
